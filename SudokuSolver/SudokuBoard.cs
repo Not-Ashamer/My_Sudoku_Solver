@@ -12,7 +12,7 @@
         size = (int)Math.Sqrt(len);
         squareSize = (int)Math.Sqrt(size);
         if (size * size != len)
-            throw new ArgumentException($"The length {len} is invalid. Must be a square number (81, 256, 625).");
+            throw new ArgumentException($"The length {len} is invalid. Must be a square number.");
         if (squareSize * squareSize != size)
             throw new ArgumentException($"The size {size}x{size} is invalid (cannot form square boxes).");
         cells = new int[len];
