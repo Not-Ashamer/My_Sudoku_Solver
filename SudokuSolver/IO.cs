@@ -1,4 +1,6 @@
-﻿public static class IO
+﻿using System.Text;
+
+public static class IO
 {
     private const string Tokens = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static void Print(SudokuBoard board)
@@ -40,5 +42,14 @@
             Console.Write("--");
         }
         Console.WriteLine();
+    }
+    public static void PrintAsString(SudokuBoard board)
+    {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < board.cells.Length; i++)
+        {
+            sb.Append(board.cells[i]);
+        }
+        Console.WriteLine(sb.ToString());
     }
 }
