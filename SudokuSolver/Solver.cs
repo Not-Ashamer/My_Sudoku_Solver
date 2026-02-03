@@ -12,6 +12,7 @@ namespace SudokuSolver
         private readonly int[] boxByCell;//maps a particular cell's position to the box it is in
         private readonly int[][] cellsInBox;
         private readonly uint baseMask;
+
         public Solver(int size)
         {
             this.size = size;
@@ -50,13 +51,14 @@ namespace SudokuSolver
             Span<uint> cols = stackalloc uint[this.size];//each index contains all the possibilities of a given row, box or column
             Span<uint> boxes = stackalloc uint[this.size];
             int[] cells = board.cells;
+            Span<int> emptyIndices = stackalloc int[cells.Length];
             int countEmpty = 0;
             for (int i = 0; i < cells.Length; i++)
             {
                 int val = cells[i];
                 if (val == 0)
                 {
-                    countEmpty++;
+                    emptyIndices[countEmpty++] = i;
                 }
                 else
                 {
@@ -75,34 +77,36 @@ namespace SudokuSolver
                     boxes[b] |= bit;
                 }
             }
-            return Backtracking(cells, rows, cols, boxes, countEmpty);
+            return Backtracking(cells, rows, cols, boxes,emptyIndices, countEmpty);
         }
-        private bool Backtracking(int[] cells, Span<uint> rows, Span<uint> cols, Span<uint> boxes, int emptyCount)
+        private bool Backtracking(int[] cells, Span<uint> rows, Span<uint> cols, Span<uint> boxes, Span<int> emptyIndices, int emptyCount)
         {
             if (emptyCount == 0) return true;
 
-            int bestIndex = -1;
+            int bestK = -1;         
+            int bestCellIndex = -1; 
             int minOptions = int.MaxValue;
             uint bestCandidates = 0;
-            for (int i = 0; i < cells.Length; i++)
+            for (int k = 0; k < emptyCount; k++)
             {
-                if (cells[i] != 0) continue;
+                int i = emptyIndices[k]; 
 
                 int r = rowByCell[i];
                 int c = colByCell[i];
                 int b = boxByCell[i];
 
                 uint candidates = ~(rows[r] | cols[c] | boxes[b]) & baseMask;
-
                 int count = BitOperations.PopCount(candidates);
-                
-                if (count == 0) return false;
+
+                if (count == 0) return false; 
 
                 if (count < minOptions)
                 {
                     minOptions = count;
-                    bestIndex = i;
+                    bestK = k;
+                    bestCellIndex = i;
                     bestCandidates = candidates;
+
                     if (count == 1) goto SkipHidden; 
                 }
             }
@@ -112,124 +116,153 @@ namespace SudokuSolver
                 var hidden = FindHiddenSingle(cells, rows, cols, boxes);
                 if (hidden.found)
                 {
-                    bestIndex = hidden.index;
+                    bestCellIndex = hidden.index;
                     bestCandidates = hidden.mask;
+                    for (int k = 0; k < emptyCount; k++)
+                    {
+                        if (emptyIndices[k] == bestCellIndex)
+                        {
+                            bestK = k;
+                            break;
+                        }
+                    }
+                    goto SkipHidden;
                 }
             }
+
         SkipHidden:
-            int bestR = rowByCell[bestIndex];
-            int bestC = colByCell[bestIndex];
-            int bestB = boxByCell[bestIndex];
+            int lastIndex = emptyCount - 1;
+            int swappedVal = emptyIndices[lastIndex];
+
+            emptyIndices[bestK] = swappedVal;
+            emptyIndices[lastIndex] = bestCellIndex; 
+
+            int bestR = rowByCell[bestCellIndex];
+            int bestC = colByCell[bestCellIndex];
+            int bestB = boxByCell[bestCellIndex];
 
             while (bestCandidates != 0)
             {
                 int bitIndex = BitOperations.TrailingZeroCount(bestCandidates);
                 uint bit = 1u << bitIndex;
 
-                cells[bestIndex] = bitIndex + 1;
+                cells[bestCellIndex] = bitIndex + 1;
                 rows[bestR] |= bit;
                 cols[bestC] |= bit;
                 boxes[bestB] |= bit;
-
-                if (Backtracking(cells, rows, cols, boxes, emptyCount - 1))
+                if (Backtracking(cells, rows, cols, boxes, emptyIndices, emptyCount - 1))
                     return true;
-                cells[bestIndex] = 0;
+                cells[bestCellIndex] = 0;
                 rows[bestR] &= ~bit;
                 cols[bestC] &= ~bit;
                 boxes[bestB] &= ~bit;
 
                 bestCandidates &= ~bit;
             }
+            emptyIndices[bestK] = bestCellIndex;
+            emptyIndices[lastIndex] = swappedVal;
 
             return false;
         }
         private (int index, uint mask, bool found) FindHiddenSingle(int[] cells, Span<uint> rows, Span<uint> cols, Span<uint> boxes)
         {
-            Span<int> counts = stackalloc int[size];
-            Span<int> positions = stackalloc int[size];
-
             for (int r = 0; r < size; r++)
             {
-                counts.Clear();
-
+                uint seenOnce = 0;
+                uint seenTwice = 0;
                 for (int c = 0; c < size; c++)
                 {
                     int idx = r * size + c;
-
                     if (cells[idx] != 0) continue;
 
                     int b = boxByCell[idx];
-
                     uint candidates = ~(rows[r] | cols[c] | boxes[b]) & baseMask;
 
-                    while (candidates != 0)
-                    {
-                        int bit = BitOperations.TrailingZeroCount(candidates);
-                        counts[bit]++;
-                        positions[bit] = idx; 
-                        candidates &= ~(1u << bit);
-                    }
+                    seenTwice |= seenOnce & candidates;
+                    seenOnce |= candidates;
                 }
-                for (int num = 0; num < size; num++)
+
+                uint hidden = seenOnce & ~seenTwice;
+                if (hidden == 0) continue;
+
+                uint targetBit = (uint)(hidden & -hidden); 
+                for (int c = 0; c < size; c++)
                 {
-                    if (counts[num] == 1) return (positions[num], 1u << num, true);
+                    int idx = r * size + c;
+                    if (cells[idx] != 0) continue;
+
+                    int b = boxByCell[idx];
+                    uint candidates = ~(rows[r] | cols[c] | boxes[b]) & baseMask;
+
+                    if ((candidates & targetBit) != 0)
+                        return (idx, targetBit, true);
                 }
             }
-
             for (int c = 0; c < size; c++)
             {
-                counts.Clear();
+                uint seenOnce = 0;
+                uint seenTwice = 0;
+
                 for (int r = 0; r < size; r++)
                 {
                     int idx = r * size + c;
-
                     if (cells[idx] != 0) continue;
 
                     int b = boxByCell[idx];
                     uint candidates = ~(rows[r] | cols[c] | boxes[b]) & baseMask;
 
-                    while (candidates != 0)
-                    {
-                        int bit = BitOperations.TrailingZeroCount(candidates);
-                        counts[bit]++;
-                        positions[bit] = idx;
-                        candidates &= ~(1u << bit);
-                    }
+                    seenTwice |= seenOnce & candidates;
+                    seenOnce |= candidates;
                 }
 
-                for (int num = 0; num < size; num++)
+                uint hidden = seenOnce & ~seenTwice;
+                if (hidden == 0) continue;
+
+                uint targetBit = (uint)(hidden & -hidden);
+                for (int r = 0; r < size; r++)
                 {
-                    if (counts[num] == 1) return (positions[num], 1u << num, true);
+                    int idx = r * size + c;
+                    if (cells[idx] != 0) continue;
+
+                    int b = boxByCell[idx];
+                    uint candidates = ~(rows[r] | cols[c] | boxes[b]) & baseMask;
+
+                    if ((candidates & targetBit) != 0)
+                        return (idx, targetBit, true);
                 }
             }
-
             for (int b = 0; b < size; b++)
             {
-                counts.Clear();
-
+                uint seenOnce = 0;
+                uint seenTwice = 0;
                 for (int k = 0; k < size; k++)
                 {
                     int idx = cellsInBox[b][k];
-
                     if (cells[idx] != 0) continue;
 
                     int r = rowByCell[idx];
                     int c = colByCell[idx];
-
                     uint candidates = ~(rows[r] | cols[c] | boxes[b]) & baseMask;
 
-                    while (candidates != 0)
-                    {
-                        int bit = BitOperations.TrailingZeroCount(candidates);
-                        counts[bit]++;
-                        positions[bit] = idx;
-                        candidates &= ~(1u << bit);
-                    }
+                    seenTwice |= seenOnce & candidates;
+                    seenOnce |= candidates;
                 }
 
-                for (int num = 0; num < size; num++)
+                uint hidden = seenOnce & ~seenTwice;
+                if (hidden == 0) continue;
+
+                uint targetBit = ((uint)(hidden & -hidden));
+                for (int k = 0; k < size; k++)
                 {
-                    if (counts[num] == 1) return (positions[num], 1u << num, true);
+                    int idx = cellsInBox[b][k];
+                    if (cells[idx] != 0) continue;
+
+                    int r = rowByCell[idx];
+                    int c = colByCell[idx];
+                    uint candidates = ~(rows[r] | cols[c] | boxes[b]) & baseMask;
+
+                    if ((candidates & targetBit) != 0)
+                        return (idx, targetBit, true);
                 }
             }
 
