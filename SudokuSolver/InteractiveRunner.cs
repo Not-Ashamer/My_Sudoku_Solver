@@ -3,11 +3,18 @@ using System.Diagnostics;
 
 namespace SudokuSolver
 {
-    public class InteractiveRunner
+	/// <summary>
+	/// Handles the "Interactive Mode" where users can input puzzles manually via the console.
+	/// Supports multiple consecutive solves without restarting.
+	/// </summary>
+	public class InteractiveRunner
     {
-        private Solver _cachedSolver;
-
-        public void Run()
+        private Solver _cachedSolver;//Prevents unnecessary regeneration of identical board sizes
+		/// <summary>
+		/// Starts the interactive loop, accepting puzzle strings until the user types 'menu' or 'exit'.
+		/// Handles Ctrl+Z gracefully.
+		/// </summary>
+		public void Run()
         {
             Console.WriteLine("\n--- Interactive Mode ---");
             Console.WriteLine("Enter a puzzle string (or type 'menu' to go back).");
@@ -15,7 +22,9 @@ namespace SudokuSolver
             while (true)
             {
                 Console.Write("\nPuzzle > ");
-                string input = Console.ReadLine()?.Trim();
+                string input = Console.ReadLine();
+                if (input == null) return;
+                input = input.Trim();
 
                 if (string.IsNullOrEmpty(input)) continue;
                 if (input.Equals("menu", StringComparison.OrdinalIgnoreCase)) break;
@@ -24,8 +33,12 @@ namespace SudokuSolver
                 ProcessInput(input);
             }
         }
-
-        private void ProcessInput(string input)
+		/// <summary>
+		/// Attempts to parse and solve a single puzzle string, printing timing stats and the result.
+		/// Catches and displays formatting errors without crashing the app.
+		/// </summary>
+		/// <param name="input">The raw puzzle string (e.g., "00302...").</param>
+		private void ProcessInput(string input)
         {
             try
             {

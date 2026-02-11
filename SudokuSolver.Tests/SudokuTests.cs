@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using SudokuSolver; 
+using System;
 
 namespace SudokuSolver.Tests
 {
@@ -252,6 +252,27 @@ namespace SudokuSolver.Tests
             Assert.IsTrue(result, "Solver should accept an already solved board.");
             //Verify the board didn't change
             Assert.AreEqual(solved, IO.ReceiveAsString(board));
+        }
+        [TestMethod]
+        public void Solve_ParallelExecution_IsThreadSafe()
+        {
+            // This test runs 100 solvers simultaneously on different threads.
+            // Because our Solver uses 'stackalloc' (stack memory), it should be 
+            // completely thread-safe without any locks.
+
+            string puzzle = "003020600900305001001806400008102900700000008006708200002609500800203009005010300";
+            string answer = "483921657967345821251876493548132976729564138136798245372689514814253769695417382";
+
+            //Run 100 iterations in parallel
+            System.Threading.Tasks.Parallel.For(0, 100, i =>
+            {
+                //Each thread gets its OWN board copy 
+                var boardCopy = new SudokuBoard(puzzle);
+                var solver = new Solver(boardCopy.size);
+                bool success = solver.Solve(boardCopy);
+                Assert.IsTrue(success, $"Thread {i} failed to solve.");
+                Assert.AreEqual(answer, IO.ReceiveAsString(boardCopy));
+            });
         }
     }
 }

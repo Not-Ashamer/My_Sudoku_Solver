@@ -6,6 +6,10 @@ namespace SudokuSolver
 {
     public class BatchRunner
     {
+        /// <summary>
+        /// This function serves as the basis for the batch mode, continually taking in inputs, 
+        /// and either calling ProcessFile to solve them, or exiting
+        /// </summary>
         public void Run()
         {
             Console.WriteLine("\n--- Batch Mode ---");
@@ -24,8 +28,12 @@ namespace SudokuSolver
 
             ProcessFile(path);
         }
-
-        private void ProcessFile(string path)
+		/// <summary>
+		/// This function accepts the string path to a file with unsolved sudokus, and solves them until they are through. To exit halfway,
+		/// type CTRL+C
+		/// </summary>
+		/// <param name="path">The file path to the newline-separated puzzle file.</param>
+		private void ProcessFile(string path)
         {
             Console.WriteLine("Processing... (This excludes file reading time)");
 
@@ -41,6 +49,12 @@ namespace SudokuSolver
             {
                 foreach (string line in File.ReadLines(path))
                 {
+                    if (SudokuApp.IsCancelled)
+                    {
+                        Console.WriteLine("\nBatch run aborted by user. Returning to menu...");
+                        SudokuApp.IsCancelled = false; 
+                        break;
+                    }
                     if (string.IsNullOrWhiteSpace(line)) continue;
 
                     try
@@ -68,10 +82,14 @@ namespace SudokuSolver
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(ex.Message);//Prevents the throwing of one exception crashing the other many puzzles
                     }
                 }
 
+            }
+            catch (PathTooLongException)
+            {
+                Console.WriteLine("Error: Path is too long.");
             }
             catch (IOException ex)
             {
@@ -81,10 +99,22 @@ namespace SudokuSolver
             {
                 Console.WriteLine("\nError: Access to the file is denied.");
             }
+            catch (ArgumentException)
+            {
+                Console.WriteLine("Error: Path contains invalid characters.");
+            }
+            
             wallClock.Stop();
             PrintStats(totalPuzzles, solvedCount, totalAlgorithmTicks, maxTicks, wallClock.Elapsed.TotalSeconds);
         }
-
+        /// <summary>
+        /// Displays the final statistics of the batch run, including timing and success rates.
+        /// </summary>
+        /// <param name="total">Total number of puzzles processed.</param>
+        /// <param name="solved">Number of puzzles successfully solved.</param>
+        /// <param name="totalTicks">Accumulated ticks for algorithm execution.</param>
+        /// <param name="maxTicks">The longest single solve time in ticks.</param>
+        /// <param name="wallTime">Total execution time including I/O.</param>
         private void PrintStats(int total, int solved, long totalTicks, long maxTicks, double wallTime)
         {
             double totalAlgoSeconds = (double)totalTicks / Stopwatch.Frequency;
