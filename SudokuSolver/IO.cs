@@ -43,13 +43,8 @@ public static class IO
         }
         Console.WriteLine();
     }
-    public static void PrintAsString(SudokuBoard board)
+    public static string RecieveAsString(SudokuBoard board)
     {
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < board.cells.Length; i++)
-        {
-            sb.Append(board.cells[i]);
-        }
-        Console.WriteLine(sb.ToString());
+        return string.Join("",board.cells);
     }
 }

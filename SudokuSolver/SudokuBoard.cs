@@ -3,9 +3,15 @@
     public int size { get; }
     public int squareSize { get; }
     public int[] cells { get; }
-
+    /// <summary>
+    /// This constructor makes sure the acquired size is valid for a proper sudoku board by 
+    /// size (must some integer raised to the fourth power)
+    /// </summary>
+    /// <param name="input"></param>
+    /// <exception cref="ArgumentException"></exception>
     public SudokuBoard(string input)
     {
+        
         if (string.IsNullOrWhiteSpace(input))
             throw new ArgumentException("Input cannot be empty.");
         int len = input.Length;
@@ -25,7 +31,6 @@
         for (int i = 0; i < input.Length; i++)
         {
             char c = char.ToUpper(input[i]);
-
             if (c == '0')
             {
                 cells[i] = 0;
