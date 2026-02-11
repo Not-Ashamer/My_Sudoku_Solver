@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text;
-using SudokuSolver;
+using SudokuSolver.SudokuSolver.Core;
 
 /// <summary>
 /// Provides utility methods for formatting Sudoku boards for console display 

@@ -1,4 +1,4 @@
-﻿namespace SudokuSolver
+﻿namespace SudokuSolver.SudokuSolver.CLI
 	{
 	/// <summary>
 	/// The entry point for the Sudoku Solver application.

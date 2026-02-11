@@ -1,7 +1,8 @@
-﻿using System;
+﻿using SudokuSolver.SudokuSolver.Core;
+using System;
 using System.Diagnostics;
 
-namespace SudokuSolver
+namespace SudokuSolver.SudokuSolver.CLI
 {
 	/// <summary>
 	/// Handles the "Interactive Mode" where users can input puzzles manually via the console.

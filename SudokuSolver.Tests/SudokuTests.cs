@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SudokuSolver; 
+using SudokuSolver.SudokuSolver.Core;
 using System;
 
 namespace SudokuSolver.Tests

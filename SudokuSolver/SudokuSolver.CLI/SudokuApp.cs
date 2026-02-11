@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SudokuSolver
+namespace SudokuSolver.SudokuSolver.CLI
 	{
 	/// <summary>
 	/// The main application controller. Handles the primary menu loop, user input selection,

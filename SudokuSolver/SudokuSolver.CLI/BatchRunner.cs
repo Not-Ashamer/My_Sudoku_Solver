@@ -1,8 +1,9 @@
-﻿using System;
+﻿using SudokuSolver.SudokuSolver.Core;
+using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace SudokuSolver
+namespace SudokuSolver.SudokuSolver.CLI
 {
     public class BatchRunner
     {
@@ -16,7 +17,7 @@ namespace SudokuSolver
             Console.WriteLine("Enter the full file path (or 'menu' to go back):");
             Console.Write("Path > ");
             string path = Console.ReadLine();
-            path = !String.IsNullOrWhiteSpace(path) ? path :"";
+            path = !string.IsNullOrWhiteSpace(path) ? path :"";
             path = path.Trim('"'); 
 
             if (path == "menu") return;
@@ -118,14 +119,14 @@ namespace SudokuSolver
         private void PrintStats(int total, int solved, long totalTicks, long maxTicks, double wallTime)
         {
             double totalAlgoSeconds = (double)totalTicks / Stopwatch.Frequency;
-            double avgMs = (totalAlgoSeconds * 1000) / (solved > 0 ? solved : 1);
+            double avgMs = totalAlgoSeconds * 1000 / (solved > 0 ? solved : 1);
 
             Console.WriteLine("\n\n--- Results ---");
             Console.WriteLine($"Total Puzzles:   {total}");
             Console.WriteLine($"Solved:          {solved}");
             Console.WriteLine($"Algorithm Time:  {totalAlgoSeconds:F4} sec (Total CPU time spent thinking)");
             Console.WriteLine($"Avg per Puzzle:  {avgMs:F4} ms");
-            Console.WriteLine($"Longest time:    {((double)maxTicks / Stopwatch.Frequency):F4} seconds");
+            Console.WriteLine($"Longest time:    {(double)maxTicks / Stopwatch.Frequency:F4} seconds");
             Console.WriteLine($"Total Wall Time: {wallTime:F4} sec (Includes file I/O)");
         }
     }

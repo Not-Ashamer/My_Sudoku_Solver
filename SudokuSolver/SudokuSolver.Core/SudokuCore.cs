@@ -1,7 +1,7 @@
 ﻿global using SolverMask = System.UInt32;
 using System;
 
-namespace SudokuSolver
+namespace SudokuSolver.SudokuSolver.Core
 	{
 	// ==========================================
 	// 1. CONFIGURATION

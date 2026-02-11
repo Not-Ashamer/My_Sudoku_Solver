@@ -2,7 +2,7 @@
 using System.Numerics;
 using System.IO;
 
-namespace SudokuSolver
+namespace SudokuSolver.SudokuSolver.Core
 {
 	/// <summary>
 	/// Core solver logic using bitwise backtracking and constraint propagation.
@@ -63,8 +63,8 @@ namespace SudokuSolver
 				throw new ArgumentException("Board size must be a perfect square (e.g., 4, 9, 16, 25).");
 			// Pre-calculate the bitmask representing all possible values for this board size.
 			// Thus preventing shifting bits inside the recursive solver.
-			baseMask = (size == sizeof(SolverMask) * 8)
-				? ~((SolverMask)0)
+			baseMask = size == sizeof(SolverMask) * 8
+				? ~(SolverMask)0
 				: ((SolverMask)1 << size) - 1;
 
 			// Initialize the lookup tables
@@ -84,7 +84,7 @@ namespace SudokuSolver
 				colByCell[i] = col;
 
 				// Calculate sub-grid index aka box using integer division
-				int b = (row / boxSize) * boxSize + (col / boxSize);
+				int b = row / boxSize * boxSize + col / boxSize;
 				boxByCell[i] = b;
 
 				// Map which flat index belongs to which position in a specific box
@@ -363,7 +363,7 @@ namespace SudokuSolver
 
 				// Update frequency masks:
 				// Any bit that was already in seenOnce and is also in candidates is now "seen twice."
-				seenTwice |= (seenOnce & candidates);
+				seenTwice |= seenOnce & candidates;
 				// Add current candidates to seenOnce.
 				seenOnce |= candidates;
 				}
@@ -373,7 +373,7 @@ namespace SudokuSolver
 			if(hidden == 0) return (-1, 0, false);
 
 			// Get the lowest set bit (the first hidden single found) using bitwise negation trick.
-			SolverMask targetBit = hidden & (SolverMask)(-(long)hidden);
+			SolverMask targetBit = hidden & (SolverMask)(-hidden);
 
 			// Find exactly which cell in the unit can host this forced number.
 			for(int i = 0; i < size; i++)

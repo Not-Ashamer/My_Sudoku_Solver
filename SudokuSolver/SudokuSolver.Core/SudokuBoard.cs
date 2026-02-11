@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SudokuSolver
+namespace SudokuSolver.SudokuSolver.Core
 	{
 	/// <summary>
 	/// Represents a square Sudoku grid of varying sizes (e.g., 9x9, 16x16).
