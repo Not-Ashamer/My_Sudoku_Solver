@@ -1,5 +1,5 @@
-﻿using System;
-
+﻿global using SolverMask = System.UInt32;
+using System;
 namespace SudokuSolver
 {
     // ==========================================
@@ -7,22 +7,22 @@ namespace SudokuSolver
     // ==========================================
     public static class SudokuConfig
     {
-        /// <summary>
-        /// The integer type used for bitmasks. 
-        /// </summary>
-        public const string BitType = "uint";
+        //Calculate the bit-depth (32 or 64) automatically using unsafe size check
+        private static readonly int BitDepth = sizeof(SolverMask) * 8;
 
         /// <summary>
-        /// The maximum board size (width/height) supported by the current BitType.
+        /// The maximum board size supported.
+        /// If 32-bit: Max is 25 (largest square < 32).
+        /// If 64-bit: Max is 49 (largest square < 64).
         /// </summary>
-        public static readonly int MaxBoardSize = BitType == "uint" ? 25 : 49;
-
+        public static readonly int MaxBoardSize = BitDepth == 32 ? 25 : 49;
+        public const int ProgressInterval = 1000;
         public static void ValidateSize(int size)
         {
             if (size > MaxBoardSize)
             {
                 throw new NotSupportedException(
-                    $"Solver is configured for '{BitType}' which supports a maximum size of {MaxBoardSize}x{MaxBoardSize}. " +
+                    $"Solver is using {BitDepth}-bit logic (SolverMask), which supports sizes up to {MaxBoardSize}x{MaxBoardSize}. " +
                     $"Received request for {size}x{size}.");
             }
             if (size < 1)
@@ -31,6 +31,7 @@ namespace SudokuSolver
             }
         }
     }
+}
 
     // ==========================================
     // 2. CUSTOM EXCEPTIONS
@@ -63,5 +64,4 @@ namespace SudokuSolver
             InvalidChar = c;
             Index = index;
         }
-    }
 }

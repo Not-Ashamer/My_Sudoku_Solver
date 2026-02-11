@@ -47,7 +47,7 @@ namespace SudokuSolver
                 {
                     Console.WriteLine($"Solved in {sw.Elapsed.TotalSeconds:F8} sec ({sw.Elapsed.TotalMilliseconds:F4} ms)");
                     IO.Print(board);
-                    Console.WriteLine(IO.RecieveAsString(board));
+                    Console.WriteLine(IO.ReceiveAsString(board));
                 }
                 else
                 {

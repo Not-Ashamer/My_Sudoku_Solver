@@ -1,5 +1,5 @@
 ﻿using System.Text;
-
+using SudokuSolver;
 public static class IO
 {
     private const string Tokens = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -43,8 +43,13 @@ public static class IO
         }
         Console.WriteLine();
     }
-    public static string RecieveAsString(SudokuBoard board)
+    public static string ReceiveAsString(SudokuBoard board)
     {
-        return string.Join("",board.cells);
+        StringBuilder sb = new StringBuilder(board.cells.Length);
+        foreach (int val in board.cells)
+        {
+            sb.Append(Tokens[val]);
+        }
+        return sb.ToString();
     }
 }

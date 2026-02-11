@@ -37,36 +37,50 @@ namespace SudokuSolver
 
             Stopwatch wallClock = Stopwatch.StartNew();
 
-            foreach (string line in File.ReadLines(path))
+            try
             {
-                if (string.IsNullOrWhiteSpace(line)) continue;
-
-                try
+                foreach (string line in File.ReadLines(path))
                 {
-                    var board = new SudokuBoard(line);
-                    totalPuzzles++;
+                    if (string.IsNullOrWhiteSpace(line)) continue;
 
-                    if (currentSolver == null || currentSolver.size != board.size)
+                    try
                     {
-                        currentSolver = new Solver(board.size);
+                        var board = new SudokuBoard(line);
+                        totalPuzzles++;
+
+                        if (currentSolver == null || currentSolver.size != board.size)
+                        {
+                            currentSolver = new Solver(board.size);
+                        }
+
+                        long start = Stopwatch.GetTimestamp();
+                        bool success = currentSolver.Solve(board);
+                        long end = Stopwatch.GetTimestamp();
+
+                        if (success)
+                        {
+                            solvedCount++;
+                            long duration = end - start;
+                            totalAlgorithmTicks += duration;
+                            if (duration > maxTicks) maxTicks = duration;
+                        }
+                        if (totalPuzzles % SudokuConfig.ProgressInterval == 0) Console.Write(".");
                     }
-
-                    long start = Stopwatch.GetTimestamp();
-                    bool success = currentSolver.Solve(board);
-                    long end = Stopwatch.GetTimestamp();
-
-                    if (success)
+                    catch (Exception ex)
                     {
-                        solvedCount++;
-                        long duration = end - start;
-                        totalAlgorithmTicks += duration;
-                        if (duration > maxTicks) maxTicks = duration;
+                        Console.WriteLine(ex.Message);
                     }
-                    if (totalPuzzles % 1000 == 0) Console.Write(".");
                 }
-                catch { /* Ignore bad inputs */ }
-            }
 
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"\nCritical Error reading file: {ex.Message}");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine("\nError: Access to the file is denied.");
+            }
             wallClock.Stop();
             PrintStats(totalPuzzles, solvedCount, totalAlgorithmTicks, maxTicks, wallClock.Elapsed.TotalSeconds);
         }
