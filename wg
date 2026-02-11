@@ -1,0 +1,71 @@
+[33mcommit 35b6d05b46e1d3acc6851b3f0beb2d4d7c6c415c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmodify/generalcleanup[m[33m)[m
+Author: Noam <noamsha006@gmail.com>
+Date:   Wed Feb 11 16:35:31 2026 +0200
+
+    test: Added about 40 tests to the SudokuSolver.Tests project, all of which pass
+
+[33mcommit 52050dac45a6a93bb9a2ed241fa12a0a39a48169[m
+Author: Noam <noamsha006@gmail.com>
+Date:   Wed Feb 11 16:34:47 2026 +0200
+
+    docs: further cleaned up code, removed more hardcoded numbers.
+
+[33mcommit c965b2ae7178345da7f8bc35cadc1f0d9b40b4a9[m
+Author: Noam <noamsha006@gmail.com>
+Date:   Wed Feb 11 10:48:13 2026 +0200
+
+    Refactored solver to be more clear, modified board logic to remove magic numbers, added config and exceptions file
+
+[33mcommit 45ce63f878364d8d778862c8fa466397063dc78d[m[33m ([m[1;32mmodify/cleanupmain[m[33m)[m
+Author: Noam <noamsha006@gmail.com>
+Date:   Wed Feb 11 09:04:33 2026 +0200
+
+    Seperated main into its relevant parts, removed some clutter
+
+[33mcommit 934b8a821b225c90ff9c1860abedf75505d0e205[m[33m ([m[1;31morigin/feature/solveroptimization[m[33m, [m[1;32mfeature/solveroptimization[m[33m, [m[1;32mdev[m[33m)[m
+Author: Noam <noamsha006@gmail.com>
+Date:   Tue Feb 3 10:37:17 2026 +0200
+
+    Further refined Solver's runtime, skips empty indices
+
+[33mcommit 3543fb07da9f85596c5fd169e3b885dd427972cc[m[33m ([m[1;32mfeature/solver[m[33m)[m
+Author: Noam <noamsha006@gmail.com>
+Date:   Mon Feb 2 22:52:39 2026 +0200
+
+    Solver with optimized backtracking
+
+[33mcommit 083bfa62cd05881544b7cdd77d6c070ac402de9e[m[33m ([m[1;31morigin/feature/solver[m[33m)[m
+Author: Noam <noamsha006@gmail.com>
+Date:   Mon Feb 2 22:51:43 2026 +0200
+
+    Finished making full backtracking and optimizing it rather well
+
+[33mcommit 955e58b4c7adc52cc5d569ae85fa08e962421d5a[m
+Author: Noam <noamsha006@gmail.com>
+Date:   Mon Feb 2 08:40:13 2026 +0200
+
+    added solver and backtracking, still doesnt work for greater than 9x9 but that is unnecessary anyways
+
+[33mcommit b169ed2c926d29925ff33094e7c604da93a9d9ab[m
+Author: Noam <noamsha006@gmail.com>
+Date:   Sun Feb 1 14:07:11 2026 +0200
+
+    added sudoku solver constructor and attributes
+
+[33mcommit ecc3dba80be05d04e9f2896e0bdb0605c22c914e[m[33m ([m[1;31morigin/dev[m[33m)[m
+Author: Noam <noamsha006@gmail.com>
+Date:   Mon Jan 26 10:46:58 2026 +0200
+
+    Added printing of board :)
+
+[33mcommit 68f7a0611954d670764cd9da8a1b6b8dcb999d38[m
+Author: Noam <noamsha006@gmail.com>
+Date:   Sun Jan 25 23:45:00 2026 +0200
+
+    Added basic board and validation logic + main input loop
+
+[33mcommit 87ecd97449d9743368394fa8a2ace139c904efd6[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: Not-Ashamer <noamsha006@gmail.com>
+Date:   Mon Jan 5 22:27:23 2026 +0200
+
+    Initial commit
