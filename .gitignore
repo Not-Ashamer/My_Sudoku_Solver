@@ -53,3 +53,5 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 /.vs/My_Sudoku_Solver/FileContentIndex
+/test
+/SudokuSolver/.vs
