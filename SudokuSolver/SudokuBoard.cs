@@ -1,26 +1,33 @@
-﻿public class SudokuBoard
+﻿using SudokuSolver;
+
+public class SudokuBoard
 {
     public int size { get; }
     public int squareSize { get; }
     public int[] cells { get; }
     /// <summary>
     /// This constructor makes sure the acquired size is valid for a proper sudoku board by 
-    /// size (must some integer raised to the fourth power)
+    /// size (must some natural number raised to the fourth power)
     /// </summary>
     /// <param name="input"></param>
     /// <exception cref="ArgumentException"></exception>
     public SudokuBoard(string input)
     {
-        
+
+        if (input == null) throw new ArgumentNullException(nameof(input),"Input cannot be null");
         if (string.IsNullOrWhiteSpace(input))
             throw new ArgumentException("Input cannot be empty.");
         int len = input.Length;
         size = (int)Math.Sqrt(len);
         squareSize = (int)Math.Sqrt(size);
         if (size * size != len)
-            throw new ArgumentException($"The length {len} is invalid. Must be a square number.");
+            throw new InvalidSudokuSizeException($"The length {len} is invalid (Must be a natural number raised to fourth power).");
         if (squareSize * squareSize != size)
-            throw new ArgumentException($"The size {size}x{size} is invalid (cannot form square boxes).");
+            throw new InvalidSudokuSizeException($"The size {size}x{size} is invalid (cannot form square boxes).");
+        if (size > SudokuConfig.MaxBoardSize)
+            throw new InvalidSudokuSizeException($"The size {size}x{size} is invalid (solver only supports sizes up to 32x32 due to uint bitmask limits).");
+        if (size < 1)
+            throw new InvalidSudokuSizeException("Size must be greater than 0.");
         cells = new int[len];
         ParseInput(input);
     }
@@ -47,7 +54,15 @@
     }
     public int this[int row, int col]
     {
-        get => cells[row * size + col];
+        get
+        {
+            if (row < 0 || row >= size || col < 0 || col >= size)
+            {
+                throw new ArgumentOutOfRangeException(
+                    $"Cell ({row}, {col}) is out of bounds for a {size}x{size} board.");
+            }
+            return cells[row * size + col];
+        }
         set => cells[row * size + col] = value;
     }
 }
